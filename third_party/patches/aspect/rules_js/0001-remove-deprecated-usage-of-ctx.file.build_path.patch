@@ -1,0 +1,48 @@
+From 43ff40ee78d1d9e1bb5df6d07205e05b666a1a68 Mon Sep 17 00:00:00 2001
+From: Trashcan <trashcan69666@gmail.com>
+Date: Sat, 27 Jul 2024 20:27:26 -0400
+Subject: [PATCH] remove deprecated usage of ctx.file.build_path
+
+---
+ js/private/js_binary.bzl     | 4 ++--
+ js/private/js_run_binary.bzl | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/js/private/js_binary.bzl b/js/private/js_binary.bzl
+index 5baa777d..24ece935 100644
+--- a/js/private/js_binary.bzl
++++ b/js/private/js_binary.bzl
+@@ -41,7 +41,7 @@ The following environment variables are made available to the Node.js runtime ba
+ 
+ The following environment variables are made available to the Node.js runtime based on the rule context:
+ 
+-* JS_BINARY__BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the Bazel target being run; equivalent to `ctx.build_file_path` of the `js_binary` target's rule context
++* JS_BINARY__BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the Bazel target being run; equivalent to `ctx.label.package + "/BUILD"` of the `js_binary` target's rule context
+ * JS_BINARY__PACKAGE: the package of the Bazel target being run; equivalent to `ctx.label.package` of the `js_binary` target's rule context
+ * JS_BINARY__TARGET: the full label of the Bazel target being run; a stringified version of `ctx.label` of the `js_binary` target's rule context
+ * JS_BINARY__TARGET_NAME: the name of the Bazel target being run; equivalent to `ctx.label.name` of the `js_binary` target's rule context
+@@ -368,7 +368,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
+ 
+     # Add rule context variables to the environment
+     builtins = {
+-        "JS_BINARY__BUILD_FILE_PATH": ctx.build_file_path,
++        "JS_BINARY__BUILD_FILE_PATH": ctx.label.package + "/BUILD",
+         "JS_BINARY__PACKAGE": ctx.label.package,
+         "JS_BINARY__TARGET_NAME": ctx.label.name,
+         "JS_BINARY__TARGET": "{}//{}:{}".format(
+diff --git a/js/private/js_run_binary.bzl b/js/private/js_run_binary.bzl
+index 95f58d17..59dfffcb 100644
+--- a/js/private/js_run_binary.bzl
++++ b/js/private/js_run_binary.bzl
+@@ -59,7 +59,7 @@ def js_run_binary(
+ 
+     The following environment variables are made available to the Node.js runtime based on the rule context:
+ 
+-    * BAZEL_BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
++    * BAZEL_BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the bazel target being run; equivalent to `ctx.label.package + "/BUILD"` of the `js_run_binary` target's rule context
+     * BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
+     * BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
+     * BAZEL_TARGET: the name of the bazel target being run; equivalent to `ctx.label.name` of the  `js_run_binary` target's rule context
+-- 
+2.45.2
+

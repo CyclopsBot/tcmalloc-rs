@@ -1,0 +1,27 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+package(default_visibility = ["//:__subpackages__"])
+
+exports_files(
+    [
+        ".shellcheckrc",
+        ".vale.ini",
+        "buf.yaml",
+        ".clang-tidy",
+    ],
+    visibility = ["//:__subpackages__"],
+)
+
+alias(
+    name = "buf",
+    actual = "@rules_buf_toolchains//:buf",
+)
+
+bzl_library(
+    name = "linters",
+    srcs = ["linters.bzl"],
+    deps = [
+        "@aspect_rules_lint//lint:lint_test",
+        "@aspect_rules_lint//lint:shellcheck",
+    ],
+)

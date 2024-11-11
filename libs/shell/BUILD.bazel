@@ -1,0 +1,21 @@
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+load("@rules_shell//shell:sh_library.bzl", "sh_library")
+load("//tools/lint:linters.bzl", "shellcheck_test")
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = ["@CyclopsBot/shell"],
+    visibility = ["//visibility:public"],
+)
+
+sh_library(
+    name = "log",
+    srcs = ["log.sh"],
+)
+
+shellcheck_test(
+    name = "lint",
+    timeout = "short",
+    srcs = [":log"],
+)

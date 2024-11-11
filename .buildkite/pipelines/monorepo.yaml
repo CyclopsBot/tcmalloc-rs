@@ -1,0 +1,67 @@
+# TODO: move to seperate push pipelines for each sub dir that wants them
+env:
+  SEMGREP_BASELINE_REF: "main"
+  BAZEL_OPT_MODE: "opt"
+  DOCKER_USERNAME: "cyclopsbot"
+steps:
+  - label: ":buildkite:"
+    command: ".buildkite/steps/annotate.sh"
+  - group: ":docker: Publish Images"
+    key: ":docker:"
+    steps:
+      - label: ":bazel: Push {{matrix.targets}}"
+        command: ".buildkite/steps/push.sh //{{matrix.targets}}"
+        matrix:
+          setup:
+            targets:
+              - "infra/images/rbe:image.push"
+              - "apps/utils/ci:image.push"
+        plugins:
+          - "CyclopsBot/doppler-secrets#v1.2.1":
+              project: "ci"
+              project-config: "pipelines"
+          - "docker-login#v2.1.0":
+              username: "$DOCKER_USERNAME"
+              password-env: "GITHUB_PACKAGES_PAT"
+              server: "ghrc.io"
+  - group: ":trivy: Scan Images"
+    depends_on: ":docker:"
+    steps:
+      - label: ":trivy: Scan {{matrix.targets}}"
+        command: ".buildkite/steps/trivy.sh {{matrix.targets}}"
+        matrix:
+          setup:
+            targets:
+              - "ghcr.io/cyclopsbot/rbe:latest"
+              - "ghcr.io/cyclopsbot/cyc:latest"
+        plugins:
+          - "CyclopsBot/doppler-secrets#v1.2.1":
+              project: "ci"
+              project-config: "pipelines"
+          - "docker-login#v2.1.0":
+              username: "$DOCKER_USERNAME"
+              password-env: "GITHUB_PACKAGES_PAT"
+              server: "ghrc.io"
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 2
+  - group: ":osv: Static Analysis"
+    steps:
+      - label: ":semgrep: Semgrep"
+        command: "bash .buildkite/steps/semgrep.sh"
+        plugins:
+          - "CyclopsBot/doppler-secrets#v1.2.1":
+              project: "ci"
+              project-config: "pipelines"
+          - "docker#v5.9.0":
+              image: "semgrep/semgrep:latest"
+              environment:
+                - "SEMGREP_APP_TOKEN"
+                - "SEMGREP_BASELINE_REF"
+      - label: ":recycle: Spellcheck"
+        command: ".buildkite/steps/spellcheck.sh"
+        plugins:
+          - "CyclopsBot/doppler-secrets#v1.2.1":
+              project: "ci"
+              project-config: "pipelines"

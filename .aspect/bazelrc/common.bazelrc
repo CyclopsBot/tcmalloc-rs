@@ -1,0 +1,35 @@
+startup --digest_function=BLAKE3
+common --nolegacy_important_outputs
+common --experimental_profile_include_target_label=true
+common --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+common --incompatible_enable_cc_toolchain_resolution
+common --repo_env=JAVA_HOME=../bazel_tools/jdk
+common --tool_java_language_version=21
+common --tool_java_runtime_version=remotejdk_21
+common --java_runtime_version=remotejdk_21
+common --java_language_version=21
+common --noslim_profile
+common --experimental_profile_include_primary_output
+common --host_cxxopt=-std=c++20
+common --cxxopt=-std=c++20
+common --remote_download_toplevel
+common --javacopt="-target 21"
+common --javacopt="-source 21"
+common --@rules_rust//rust/settings:experimental_use_cc_common_link
+common --noenable_workspace
+common --workspace_status_command=./tools/workspace_status.sh
+common --lockfile_mode=update
+common --@aspect_rules_ts//ts:default_to_tsc_transpiler
+common --@aspect_rules_ts//ts:skipLibCheck=always
+common --experimental_remote_merkle_tree_cache_size=3500
+common --experimental_output_paths=strip
+common --modify_execution_info=CppCompile=+supports-path-mapping
+common --modify_execution_info=CppModuleMap=+supports-path-mapping
+common --modify_execution_info=ProtoCompile=+supports-path-mapping
+common --reuse_sandbox_directories
+common --noexperimental_check_external_repository_files
+common --nolegacy_external_runfiles
+common --@rules_go//go/config:pure
+common --experimental_use_hermetic_linux_sandbox
+common --sandbox_add_mount_pair=/tmp/zig-cache
+build --nobuild_runfile_links

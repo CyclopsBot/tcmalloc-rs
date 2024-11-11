@@ -1,0 +1,48 @@
+[advisories]
+version = 2
+yanked = "warn"
+
+[licenses]
+version = 2
+allow = [
+  "MIT",
+  "Apache-2.0",
+  "MPL-2.0",
+  "ISC",
+  "BSD-3-Clause",
+  "BSD-2-Clause",
+]
+exceptions = [
+  { allow = ["Zlib"], crate = "const_format" },
+  { allow = ["Zlib"], crate = "const_format_proc_macros" },
+  { allow = ["Unicode-DFS-2016"], crate = "unicode-ident" },
+  #{ allow = ["OpenSSL"], crate = "ring" },
+]
+private = { ignore = true }
+confidence-threshold = 1.0
+
+[[licenses.clarify]]
+crate = "ring"
+expression = "ISC AND MIT AND OpenSSL"
+license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
+[[licenses.clarify]]
+crate = "webpki"
+expression = "ISC"
+license-files = [{ path = "LICENSE", hash = 0x001c7e6c }]
+
+[bans]
+multiple-versions = "allow"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
+allow = []
+deny = []
+skip = []
+skip-tree = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

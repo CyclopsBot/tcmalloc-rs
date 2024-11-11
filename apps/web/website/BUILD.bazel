@@ -1,0 +1,76 @@
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
+load("@fremtind_rules_vitest//vitest:defs.bzl", "vitest_test")
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+load("//libs/bazel/rules:defs.bzl", "svelte")
+
+# gazelle:js disabled
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = [
+        "@CyclopsBot/web",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "srcs",
+    srcs = glob(
+        [
+            "src/**",
+            "static/**",
+        ],
+    ),
+)
+
+ts_config(
+    name = "tsconfig",
+    src = "base.tsconfig.json",
+    visibility = ["//visibility:public"],
+    deps = ["//libs/javascript/tsconfig_common:lib"],
+)
+
+svelte(
+    name = "bin",
+    srcs = [
+        ":srcs",
+        ":storybook",
+    ],
+    config = [":vite_config"],
+    package_json = ["package.json"],
+    tsconfig = [":tsconfig.json"],
+    deps = ["//:node_modules"],
+)
+
+vitest_test(
+    name = "test",
+    config = "vitest.config.mjs",
+    data = [
+        "src/index.test.ts",
+    ],
+    node_modules = "//:node_modules",
+)
+
+ts_project(
+    name = "storybook",
+    srcs = [
+        ".storybook/main.ts",
+        ".storybook/preview.ts",
+    ],
+    tsconfig = ":tsconfig",
+    deps = [
+        "//:node_modules/@storybook/svelte",
+        "//:node_modules/@storybook/sveltekit",
+    ],
+)
+
+ts_project(
+    name = "vite_config",
+    srcs = ["vite.config.ts"],
+    tsconfig = ":tsconfig",
+    deps = [
+        "//:node_modules/@sveltejs/kit",
+        "//:node_modules/vite",
+    ],
+)

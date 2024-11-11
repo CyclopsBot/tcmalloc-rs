@@ -1,0 +1,37 @@
+env:
+  DOCKER_USERNAME: "cyclopsbot"
+steps:
+  - group: ":trivy: Scan images"
+    steps:
+      - label: ":trivy: Scan {{matrix.targets}}"
+        command: ".buildkite/steps/trivy.sh {{matrix.targets}}"
+        matrix:
+          setup:
+            targets:
+              - "ghcr.io/cyclopsbot/rbe:latest"
+              - "ghcr.io/cyclopsbot/cyc:latest"
+        plugins:
+          - "CyclopsBot/doppler-secrets#v1.2.1":
+              project: "ci"
+              project-config: "pipelines"
+          - "docker-login#v2.1.0":
+              username: "$DOCKER_USERNAME"
+              password-env: "GITHUB_PACKAGES_PAT"
+              server: "ghrc.io"
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 2
+  - group: ":osv: Static Analysis"
+    steps:
+      - label: ":semgrep: Semgrep"
+        command: "bash .buildkite/steps/semgrep.sh"
+        plugins:
+          - "CyclopsBot/doppler-secrets#v1.2.1":
+              project: "ci"
+              project-config: "pipelines"
+          - "docker#v5.9.0":
+              image: "semgrep/semgrep:latest"
+              environment:
+                - "SEMGREP_APP_TOKEN"
+                - "SEMGREP_BASELINE_REF"

@@ -1,0 +1,43 @@
+load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+
+stardoc_with_diff_test(
+    name = "defs",
+    bzl_library_target = "//libs/bazel/rules:defs",
+)
+
+stardoc_with_diff_test(
+    name = "tar",
+    bzl_library_target = "//libs/bazel/rules/private:tar",
+)
+
+stardoc_with_diff_test(
+    name = "container",
+    bzl_library_target = "//libs/bazel/rules/private:container",
+)
+
+stardoc_with_diff_test(
+    name = "vite",
+    bzl_library_target = "//libs/bazel/rules/private:vite",
+)
+
+stardoc_with_diff_test(
+    name = "svelte",
+    bzl_library_target = "//libs/bazel/rules/private:svelte",
+)
+
+stardoc_with_diff_test(
+    name = "cargo_deny",
+    bzl_library_target = "//libs/bazel/rules/private:cargo_deny",
+)
+
+stardoc_with_diff_test(
+    name = "transition",
+    bzl_library_target = "//libs/bazel/rules/private:transition",
+)
+
+stardoc_with_diff_test(
+    name = "upx",
+    bzl_library_target = "//libs/bazel/rules/private:upx",
+)
+
+update_docs(name = "update")

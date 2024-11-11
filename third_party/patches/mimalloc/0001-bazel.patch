@@ -1,0 +1,89 @@
+From 7e977bcbcfbf2d2fe09f6f63e05941c579ab9dc8 Mon Sep 17 00:00:00 2001
+From: Trashcan <trashcan69666@gmail.com>
+Date: Mon, 5 Aug 2024 22:09:04 -0400
+Subject: [PATCH] mimalloc bazel
+
+---
+ BUILD.bazel  | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ MODULE.bazel |  6 ++++++
+ 2 files changed, 62 insertions(+)
+ create mode 100644 BUILD.bazel
+ create mode 100644 MODULE.bazel
+
+diff --git a/BUILD.bazel b/BUILD.bazel
+new file mode 100644
+index 00000000..0b2ca5e2
+--- /dev/null
++++ b/BUILD.bazel
+@@ -0,0 +1,56 @@
++load("@rules_cc//cc:defs.bzl", "cc_library")
++
++cc_library(
++    name = "mimalloc",
++    srcs = [
++        "include/mimalloc.h",
++        "include/mimalloc/atomic.h",
++        "include/mimalloc/internal.h",
++        "include/mimalloc/prim.h",
++        "include/mimalloc/track.h",
++        "include/mimalloc/types.h",
++        "src/alloc.c",
++        "src/alloc-aligned.c",
++        "src/alloc-posix.c",
++        "src/arena.c",
++        "src/bitmap.c",
++        "src/bitmap.h",
++        "src/heap.c",
++        "src/init.c",
++        "src/libc.c",
++        "src/options.c",
++        "src/os.c",
++        "src/page.c",
++        "src/prim/prim.c",
++        "src/random.c",
++        "src/segment.c",
++        "src/segment-map.c",
++        "src/stats.c",
++    ],
++    includes = ["include"],
++    linkstatic = True,
++    local_defines = select({
++        "@platforms//os:macos": [
++            "MI_OSX_INTERPOSE=1",
++            "MI_OSX_ZONE=1",
++        ],
++        "//conditions:default": [
++            "MI_SECURE=0",
++            "MI_STATIC_LIB",
++        ],
++    }),
++    textual_hdrs = [
++        "src/alloc-override.c",
++        "src/arena-abandon.c",
++        "src/free.c",
++        "src/page-queue.c",
++        "src/prim/emscripten/prim.c",
++        "src/prim/osx/prim.c",
++        "src/prim/prim.c",
++        "src/prim/unix/prim.c",
++        "src/prim/wasi/prim.c",
++        "src/prim/windows/prim.c",
++    ],
++    visibility = ["//visibility:public"],
++    alwayslink = True,
++)
+diff --git a/MODULE.bazel b/MODULE.bazel
+new file mode 100644
+index 00000000..9c9715e9
+--- /dev/null
++++ b/MODULE.bazel
+@@ -0,0 +1,6 @@
++module(
++    name = "mimalloc",
++    version = "1",
++)
++bazel_dep(name = "rules_cc", version = "0.0.9")
++bazel_dep(name = "platforms", version = "0.0.10")
+-- 
+2.45.2
+

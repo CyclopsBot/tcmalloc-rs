@@ -1,0 +1,8 @@
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = ["@CyclopsBot/ci"],
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,9 @@
+[files]
+extend-exclude = [
+    "infra/images/rbe/apko.lock.json",
+    "infra/images/base/apko.lock.json",
+    "experimental/copy.bara.sky",
+    "third_party/javascript",
+    "third_party/rust/crates",
+    "third_party/patches",
+]

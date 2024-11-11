@@ -1,0 +1,7 @@
+load(":analysis.bzl", "tar_test_suite")
+
+exports_files(["test.txt"])
+
+tar_test_suite(
+    name = "test_suite",
+)

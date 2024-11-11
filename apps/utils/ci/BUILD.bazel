@@ -1,0 +1,143 @@
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_clippy", "rust_doc", "rust_doc_test", "rust_library", "rustfmt_test")
+load("//libs/bazel/rules:defs.bzl", "build_image", "tar")
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = [
+        "@CyclopsBot/rust",
+        "@CyclopsBot/devx",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+rust_library(
+    name = "error",
+    srcs = ["src/error.rs"],
+    deps = [
+        "//third_party/rust/crates:miette",
+        "//third_party/rust/crates:thiserror",
+    ],
+)
+
+rust_library(
+    name = "commands_ci",
+    srcs = [
+        "src/commands/ci/annotate.rs",
+        "src/commands/ci/healthcheck.rs",
+        "src/commands/ci/lib.rs",
+    ],
+    deps = [
+        "//third_party/rust/crates:clap",
+        "//third_party/rust/crates:human_bytes",
+        "//third_party/rust/crates:owo-colors",
+        "//third_party/rust/crates:serde",
+        "//third_party/rust/crates:sysinfo",
+        "//third_party/rust/crates:toml",
+        "//third_party/rust/crates:tracing",
+    ],
+)
+
+rust_library(
+    name = "commands",
+    srcs = [
+        "src/commands/init.rs",
+        "src/commands/lib.rs",
+    ],
+    deps = [
+        ":commands_ci",
+        "//third_party/rust/crates:clap",
+        "//third_party/rust/crates:tracing",
+    ],
+)
+
+rust_library(
+    name = "app",
+    srcs = ["src/app.rs"],
+    deps = [
+        ":commands",
+        "//third_party/rust/crates:clap",
+    ],
+)
+
+rust_library(
+    name = "session",
+    srcs = ["src/session.rs"],
+    proc_macro_deps = [
+        "//third_party/rust/crates:async-trait",
+    ],
+    deps = [
+        ":app",
+        "//third_party/rust/crates:clap",
+        "//third_party/rust/crates:starbase",
+        "//third_party/rust/crates:tracing",
+    ],
+)
+
+rust_binary(
+    name = "bin",
+    srcs = [
+        "src/main.rs",
+    ],
+    crate_name = "cyc",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":app",
+        ":commands",
+        ":session",
+        "//libs/rust/tcmalloc:lib",
+        "//third_party/rust/crates:clap",
+        "//third_party/rust/crates:starbase",
+        "//third_party/rust/crates:tokio",
+        "//third_party/rust/crates:tracing-subscriber",
+    ],
+)
+
+rust_clippy(
+    name = "clippy",
+    deps = [
+        ":app",
+        ":bin",
+        ":commands",
+        ":commands_ci",
+        ":error",
+        ":session",
+    ],
+)
+
+rustfmt_test(
+    name = "format",
+    timeout = "short",
+    targets = [
+        ":app",
+        ":bin",
+        ":commands",
+        ":error",
+        ":session",
+        ":commands_ci",
+    ],
+)
+
+rust_doc(
+    name = "doc",
+    crate = ":bin",
+)
+
+rust_doc_test(
+    name = "doc_test",
+    timeout = "short",
+    crate = ":bin",
+)
+
+# Exposes image.push image.load and image.sha256 for convencience
+build_image(
+    name = "image",
+    srcs = [":bin"],
+    repository = "ghcr.io/cyclopsbot/cyc",
+)
+
+tar(
+    name = "tar",
+    srcs = [":bin"],
+)

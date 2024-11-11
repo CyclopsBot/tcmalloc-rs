@@ -1,0 +1,47 @@
+load("@aspect_rules_ts//ts:proto.bzl", "ts_proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("@rules_buf//buf:defs.bzl", "buf_lint_test")
+load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//proto:def.bzl", "go_proto_library")
+load("@rules_rust//proto/protobuf:defs.bzl", "rust_proto_library")
+
+buf_lint_test(
+    name = "lint",
+    config = "//tools/lint:buf.yaml",
+    targets = [":lib"],
+)
+
+proto_library(
+    name = "lib",
+    srcs = ["command.proto"],
+    visibility = ["//visibility:public"],
+)
+
+go_proto_library(
+    name = "lib_go",
+    compilers = ["@rules_go//proto:go_grpc"],
+    importpath = "libs/proto/command/v1",
+    proto = ":lib",
+    visibility = ["//visibility:public"],
+)
+
+rust_proto_library(
+    name = "command_rs",
+    crate_name = "command_proto",
+    deps = [":lib"],
+)
+
+go_library(
+    name = "command_go",
+    embed = [":lib_go"],
+    importpath = "libs/proto/command/v1",
+    visibility = ["//visibility:public"],
+)
+
+ts_proto_library(
+    name = "lib_ts",
+    copy_files = False,
+    node_modules = "//:node_modules",
+    proto = ":lib",
+    proto_srcs = ["command.proto"],
+)

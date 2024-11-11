@@ -1,0 +1,142 @@
+"""
+# **Container**
+Utilities for building containers.
+"""
+
+load("@aspect_bazel_lib//lib:tar.bzl", "mtree_mutate", "mtree_spec", _aspect_tar = "tar")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index", "oci_load", "oci_push")
+load("//libs/bazel/rules/private:transition.bzl", "multi_arch")
+load("//libs/bazel/rules/private:upx.bzl", "upx")
+
+def _impl(name, srcs, repository, binary_name, remote_tag, base, platforms, visibility):
+    repo_tags = "{repository}:{remote_tag}".format(repository = repository, remote_tag = remote_tag)
+    entrypoint = "/{}.upx".format(binary_name)
+    upx(
+        name = "{}.upx".format(name),
+        srcs = srcs,
+        out = "{}.upx".format(binary_name),
+        tags = ["manual"],
+    )
+    mtree_spec(
+        name = "{}.mtree".format(name),
+        srcs = [":{}.upx".format(name)],
+        tags = ["manual"],
+    )
+    mtree_mutate(
+        name = "{}.mutate".format(name),
+        mtree = ":{}.mtree".format(name),
+        strip_prefix = native.package_name(),
+        owner = 10000,
+        awk_script = "//tools:modify_mtree.awk",
+        tags = ["manual"],
+    )
+    _aspect_tar(
+        name = "{}.tar".format(name),
+        srcs = [":{}.upx".format(name)],
+        mtree = ":{}.mutate".format(name),
+        compress = "zstd",
+        tags = ["manual"],
+    )
+    oci_image(
+        name = "{}.image".format(name),
+        base = base,
+        tars = [":{}.tar".format(name)],
+        entrypoint = [entrypoint],
+        tags = ["local"],
+    )
+    oci_load(
+        name = "{}.load".format(name),
+        image = ":{}.image".format(name),
+        repo_tags = [repo_tags],
+        tags = ["manual"],
+        visibility = visibility,
+    )
+    multi_arch(
+        name = "{}.march".format(name),
+        image = ":{}.image".format(name),
+        platforms = platforms,
+        tags = ["manual"],
+    )
+    oci_image_index(
+        name = name,
+        images = [
+            ":{}.march".format(name),
+        ],
+        tags = ["manual"],
+        visibility = visibility,
+    )
+    oci_push(
+        name = "{}.push".format(name),
+        image = ":{}.image".format(name),
+        remote_tags = [remote_tag],
+        repository = repository,
+        tags = ["manual"],
+        visibility = visibility,
+    )
+    native.alias(
+        name = "{}.sha256".format(name),
+        actual = "{}.image.digest".format(name),
+        tags = ["manual"],
+        visibility = visibility,
+    )
+
+build_image = macro(
+    implementation = _impl,
+    doc = """
+    Builds a multi-architecture OCI image and index.
+
+    #### **flow**
+    ```mermaid
+        graph TD;
+            binary-->upx;
+            upx-->tar;
+            tar-->oci_image;
+            oci_image-->march_image;
+            march_image-->image_index;
+            image_index-->target.push;
+            image_index-->target.sha256;
+            oci_image-->target.load;
+    ```
+
+    #### **Example**
+    ```starlark
+    build_image(
+        name = "my_multi_arch_image",
+        base = "//infra/images/base:image",
+        srcs = ["file1", "file2"],
+        platforms = ["//tools/platforms:linux_amd64_musl"], # optional
+        entry_point = "/my/entrypoint", # optional
+    )
+    ```
+    """,
+    attrs = {
+        "base": attr.label(
+            configurable = False,
+            default = "//infra/images/base:image",
+            doc = "The base image to use.",
+        ),
+        "binary_name": attr.string(
+            configurable = False,
+            default = "bin",
+            doc = "Name of the binary that the container will run.",
+        ),
+        "platforms": attr.label_list(
+            configurable = False,
+            default = ["//tools/platforms:linux_aarch64", "//tools/platforms:linux_amd64"],
+            doc = "Bazel platform(s) you wish to use.",
+        ),
+        "remote_tag": attr.string(
+            configurable = False,
+            default = "bin",
+            doc = "Name of the binary that the container will run.",
+        ),
+        "repository": attr.string(
+            configurable = False,
+            doc = "The remote repository you want to use.",
+        ),
+        "srcs": attr.label_list(
+            configurable = False,
+            doc = "Files you wish to include in the container.",
+        ),
+    },
+)

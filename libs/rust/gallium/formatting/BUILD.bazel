@@ -1,0 +1,39 @@
+load("@rules_rust//rust:defs.bzl", "rust_clippy", "rust_doc", "rust_doc_test", "rust_library", "rust_test_suite", "rustfmt_test")
+
+rust_library(
+    name = "lib",
+    srcs = [
+        "src/lib.rs",
+    ],
+    crate_name = "gallium",
+    visibility = ["//visibility:public"],
+)
+
+rust_test_suite(
+    name = "unit",
+    timeout = "short",
+    srcs = glob(["tests/**/*.rs"]),
+    deps = [":lib"],
+)
+
+rustfmt_test(
+    name = "format",
+    timeout = "short",
+    targets = [":lib"],
+)
+
+rust_doc(
+    name = "doc",
+    crate = ":lib",
+)
+
+rust_doc_test(
+    name = "doc_test",
+    timeout = "short",
+    crate = ":lib",
+)
+
+rust_clippy(
+    name = "clippy",
+    deps = [":lib"],
+)

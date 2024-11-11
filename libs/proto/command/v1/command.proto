@@ -1,0 +1,24 @@
+syntax = "proto3";
+package command.v1;
+
+message CommandRequest {
+  string name = 1;
+  int64 user_id = 2;
+  int64 guild_id = 3;
+}
+
+message CommandResponse {
+  string name = 1;
+  int64 user_id = 2;
+  int64 guild_id = 3;
+  CommandResult result = 4;
+}
+
+enum CommandResult {
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
+service Command {
+  rpc Command(CommandRequest) returns (CommandResponse);
+}

@@ -1,0 +1,13 @@
+configure:
+  languages:
+    go: true
+    javascript: true
+    protobuf: true
+    python: true
+    starlark: true
+  plugins:
+    - "tools/configure/rules_cc.star"
+lint:
+  aspects:
+    - "//tools/lint:linters.bzl%buf"
+    - "//tools/lint:linters.bzl%shellcheck"

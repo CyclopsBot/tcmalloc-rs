@@ -1,0 +1,16 @@
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = [
+        "@CyclopsBot/gallium",
+        "@CyclopsBot/rust",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "formatting",
+    actual = "//libs/rust/gallium/formatting:lib",
+)

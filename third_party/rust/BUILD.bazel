@@ -1,0 +1,61 @@
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_vendor")
+load("//libs/bazel/rules:defs.bzl", "cargo_deny_test")
+
+# gazelle:ignore
+
+crates_vendor(
+    name = "rust_deps",
+    annotations = {
+        "crossbeam-utils": [crate.annotation(
+            gen_build_script = False,
+        )],
+        "iana-time-zone-haiku": [crate.annotation(
+            gen_build_script = False,
+            deps = ["//third_party/rust/patches/iana-time-zone-haiku:lib"],
+        )],
+        "owo-colors": [crate.annotation(
+            gen_build_script = False,
+        )],
+        #"rdkafka-sys": [crate.annotation(
+        #    gen_build_script = False,
+        #    deps = ["@librdkafka"],
+        #)],
+        "protoc-gen-prost": [crate.annotation(
+            gen_binaries = ["protoc-gen-prost"],
+        )],
+        "protoc-gen-tonic": [crate.annotation(
+            gen_binaries = ["protoc-gen-tonic"],
+        )],
+        "zstd-safe": [crate.annotation(
+            gen_build_script = False,
+        )],
+        "zstd-sys": [crate.annotation(
+            gen_build_script = False,
+            deps = ["@zstd"],
+        )],
+    },
+    cargo_lockfile = ":Cargo.lock",
+    manifests = [":Cargo.toml"],
+    mode = "remote",
+    repository_name = "rust_deps",
+    supported_platform_triples = [
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-gnu",
+    ],
+)
+
+cargo_deny_test(
+    name = "cargo_deny",
+    timeout = "short",
+    srcs = [
+        ":Cargo.lock",
+        ":deny.toml",
+    ],
+    exec_properties = {
+        # TODO: Use hermetic cargo
+        "container-image": "docker://ghcr.io/cyclopsbot/rbe@sha256:ddc55c94c5b214123d6c60897d75d1ce8768d95341583084da63068d9db93811",
+        "dockerNetwork": "bridge",
+    },
+    tags = ["requires-network"],
+    workspace = ":Cargo.toml",
+)

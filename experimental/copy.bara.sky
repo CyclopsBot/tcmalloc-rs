@@ -1,0 +1,19 @@
+""""""
+
+core.workflow(
+    name = "default",
+    origin = git.origin(
+        url = "https://github.com/CyclopsBot/brooooo.git",
+        ref = "main",
+        #partial_fetch = True,
+    ),
+    destination = git.github_pr_destination(
+        url = "https://github.com/CyclopsBot/copybara-test.git",
+        destination_ref = "main",
+    ),
+    destination_files = glob(["**/**"]),
+    authoring = authoring.pass_thru("Copybara <copybara@cyclopsbot.xyz>"),
+    transformations = [
+        core.move("", "testing534"),
+    ],
+)

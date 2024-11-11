@@ -1,0 +1,14 @@
+contents:
+  keyring:
+    - "https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"
+  repositories:
+    - "https://packages.wolfi.dev/os"
+  packages:
+    - "wolfi-base"
+    - "libgcc"
+    - "libstdc++"
+    - "bash"
+cmd: "/bin/bash"
+archs:
+  - "amd64"
+  - "arm64"

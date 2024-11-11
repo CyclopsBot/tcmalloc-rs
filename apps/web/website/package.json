@@ -1,0 +1,35 @@
+{
+  "name": "website",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "npm run test:integration && npm run test:unit",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "test:unit": "vitest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@chromatic-com/storybook": "3.2.2",
+    "@storybook/addon-essentials": "8.5.0-alpha.2",
+    "@storybook/addon-interactions": "8.5.0-alpha.2",
+    "@storybook/addon-links": "8.5.0-alpha.2",
+    "@storybook/blocks": "8.5.0-alpha.2",
+    "@storybook/svelte": "8.5.0-alpha.2",
+    "@storybook/sveltekit": "8.5.0-alpha.2",
+    "@storybook/test": "8.5.0-alpha.2",
+    "@sveltejs/adapter-auto": "3.3.1",
+    "@sveltejs/kit": "2.8.0",
+    "@sveltejs/vite-plugin-svelte": "4.0.0",
+    "esm-env": "1.1.4",
+    "posthog-js": "1.181.0",
+    "storybook": "8.5.0-alpha.2",
+    "svelte": "5.1.12",
+    "svelte-check": "4.0.5"
+  }
+}

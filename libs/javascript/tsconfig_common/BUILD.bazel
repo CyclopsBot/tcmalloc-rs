@@ -1,0 +1,15 @@
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = ["@CyclopsBot/javascript"],
+    visibility = ["//visibility:public"],
+)
+
+ts_config(
+    name = "lib",
+    src = "tsconfig.json",
+    visibility = ["//visibility:public"],
+)

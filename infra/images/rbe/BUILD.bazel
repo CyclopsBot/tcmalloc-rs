@@ -1,0 +1,68 @@
+load("@rules_apko//apko:defs.bzl", "apko_image")
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index", "oci_push")
+load("//libs/bazel/rules:defs.bzl", "multi_arch")
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = [
+        "@CyclopsBot/bazel",
+        "@CyclopsBot/infra",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+platform(
+    name = "platform",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    exec_properties = {
+        "OSFamily": "Linux",
+        # TODO: experiment auto updating this
+        "container-image": "docker://ghcr.io/cyclopsbot/rbe@sha256:e7f62158fe1ade490009ae0b78bba25aedde033ff1e9d29ce9b4753883d99d3f",
+        "dockerNetwork": "off",
+    },
+)
+
+apko_image(
+    name = "base",
+    architecture = select({
+        "@platforms//cpu:arm64": "arm64",
+        "@platforms//cpu:x86_64": "amd64",
+    }),
+    config = "apko.yaml",
+    contents = "@rbe_package_lock//:contents",
+    tag = "rbe_base:latest",
+)
+
+oci_image(
+    name = "image",
+    base = ":base",
+    tags = ["local"],
+)
+
+multi_arch(
+    name = "images",
+    image = ":image",
+    platforms = [
+        "//tools/platforms:linux_aarch64",
+        "//tools/platforms:linux_amd64",
+    ],
+)
+
+oci_image_index(
+    name = "index",
+    images = [
+        ":images",
+    ],
+)
+
+oci_push(
+    name = "image.push",
+    image = ":index",
+    remote_tags = ["latest"],
+    repository = "ghcr.io/cyclopsbot/rbe",
+)

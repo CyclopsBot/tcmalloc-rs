@@ -1,0 +1,8 @@
+{
+  "include": ["**/*.ts", "**/*.js", ".storybook/**/*.ts"],
+  "exclude": ["node_modules"],
+  "extends": "../../../libs/javascript/tsconfig_common/tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "bundler"
+  }
+}

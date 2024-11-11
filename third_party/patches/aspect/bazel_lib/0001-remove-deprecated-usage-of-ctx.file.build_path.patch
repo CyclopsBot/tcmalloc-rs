@@ -1,0 +1,48 @@
+From 1b234a792b3705e7394e4c9bdf7c063b608f9c1e Mon Sep 17 00:00:00 2001
+From: Trashcan <trashcan69666@gmail.com>
+Date: Sat, 27 Jul 2024 20:29:51 -0400
+Subject: [PATCH] remove deprecated usage of ctx.file.build_path
+
+---
+ lib/private/diff_test.bzl        | 2 +-
+ lib/private/expand_variables.bzl | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/private/diff_test.bzl b/lib/private/diff_test.bzl
+index e1ea14e..26dcac9 100644
+--- a/lib/private/diff_test.bzl
++++ b/lib/private/diff_test.bzl
+@@ -70,7 +70,7 @@ def _diff_test_impl(ctx):
+             "{fail_msg}": ctx.attr.failure_message,
+             "{file1}": file1_path,
+             "{file2}": file2_path,
+-            "{build_file_path}": ctx.build_file_path,
++            "{build_file_path}": ctx.label.package + "/BUILD",
+         },
+         is_executable = True,
+     )
+diff --git a/lib/private/expand_variables.bzl b/lib/private/expand_variables.bzl
+index a1f75bf..69fb21f 100644
+--- a/lib/private/expand_variables.bzl
++++ b/lib/private/expand_variables.bzl
+@@ -27,7 +27,7 @@ def expand_variables(ctx, s, outs = [], attribute_name = "args"):
+       - `$(RULEDIR)`: The output directory of the rule, that is, the directory
+         corresponding to the name of the package containing the rule under the bin tree.
+ 
+-      - `$(BUILD_FILE_PATH)`: ctx.build_file_path
++      - `$(BUILD_FILE_PATH)`: ctx.label.package + "/BUILD"
+ 
+       - `$(VERSION_FILE)`: ctx.version_file.path
+ 
+@@ -73,7 +73,7 @@ def expand_variables(ctx, s, outs = [], attribute_name = "args"):
+     additional_substitutions["RULEDIR"] = rule_dir
+ 
+     # Add some additional make variable substitutions for common useful values in the context
+-    additional_substitutions["BUILD_FILE_PATH"] = ctx.build_file_path
++    additional_substitutions["BUILD_FILE_PATH"] = ctx.label.package + "/BUILD"
+     additional_substitutions["VERSION_FILE"] = ctx.version_file.path
+     additional_substitutions["INFO_FILE"] = ctx.info_file.path
+     additional_substitutions["TARGET"] = "{}//{}:{}".format(
+-- 
+2.45.2
+

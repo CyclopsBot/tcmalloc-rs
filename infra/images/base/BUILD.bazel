@@ -1,0 +1,31 @@
+load("@rules_apko//apko:defs.bzl", "apko_image")
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+load("@rules_oci//oci:defs.bzl", "oci_image")
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = [
+        "@CyclopsBot/bazel",
+        "@CyclopsBot/infra",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+apko_image(
+    name = "base",
+    architecture = select({
+        "@platforms//cpu:arm64": "arm64",
+        "@platforms//cpu:x86_64": "amd64",
+    }),
+    config = "apko.yaml",
+    contents = "@base_package_lock//:contents",
+    tag = "base:latest",
+)
+
+oci_image(
+    name = "image",
+    base = ":base",
+    tags = ["local"],
+    visibility = ["//visibility:public"],
+)

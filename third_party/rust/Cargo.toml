@@ -1,0 +1,40 @@
+[package]
+name = "cargo_local"
+publish = false
+version = "0.0.0"
+edition = "2021"
+
+[[bin]]
+name = "null"
+path = "fake.rs"
+
+[dependencies]
+zstd = "0.13.2"
+async-trait = "0.1.83"
+owo-colors = "4.1.0"
+prost = "0.13.3"
+tonic = "0.12.3"
+twilight-model = "0.15.4"
+toml = "0.8.19"
+sysinfo = "0.32.0"
+tracing = "0.1.40"
+prost-types = { version = "0.13.3", default-features = false }
+protoc-gen-prost = "0.4.0"
+protoc-gen-tonic = "0.4.1"
+starbase = "0.9.3"
+tracing-subscriber = "0.3.18"
+thiserror = "2.0.0"
+clap = { version = "4.5.20", features = ["derive"] }
+miette = { version = "7.2.0", features = ["fancy"] }
+tokio = { version = "1.41.1", default_features = false, features = [
+  "rt-multi-thread",
+  "time",
+  "tracing",
+  "macros",
+  "signal",
+  "parking_lot",
+] }
+human_bytes = { version = "0.4.3", default-features = false, features = [
+  "fast",
+] }
+serde = { version = "1.0.214", features = ["derive"] }

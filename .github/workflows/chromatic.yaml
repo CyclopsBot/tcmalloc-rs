@@ -1,0 +1,64 @@
+name: Deploy(Pages)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  change-detection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      site: ${{ steps.filter.outputs.site }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08
+        with:
+          sparse-checkout: |
+            "apps/web/website"
+            ".github"
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+        id: filter
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            site:
+              - "apps/web/website/**"
+              - ".github/workflows/**"
+  publish-chromatic:
+    needs: change-detection
+    if: ${{ needs.change-detection.outputs.site == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      deployments: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@26961cf329f22f6837d5f54c3efd76b480300ace
+        with:
+          node-version: "20.7.0"
+      - uses: "pnpm/action-setup@v4"
+        with:
+          version: "8.6.7"
+      - name: Install deps
+        run: pnpm install
+      - uses: chromaui/action@latest
+        name: "Publish"
+        with:
+          projectToken: ${{ secrets.CHROMATIC_TOKEN }}
+          workingDir: "apps/web/website"
+          onlyChanged: true
+          exitZeroOnChanges: true
+          autoAcceptChanges: "main"

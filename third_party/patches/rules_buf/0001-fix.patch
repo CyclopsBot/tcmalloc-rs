@@ -1,0 +1,44 @@
+From 512c90d1b32126bed44f1651217ad81124d947dd Mon Sep 17 00:00:00 2001
+From: Trashcan <trashcan69666@gmail.com>
+Date: Sat, 10 Aug 2024 00:16:14 -0400
+Subject: [PATCH] fix
+
+---
+ BUILD.bazel | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 08b0b55..025b50b 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -13,7 +13,6 @@
+ # limitations under the License.
+ 
+ load("@bazel_gazelle//:def.bzl", "gazelle")
+-load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
+ load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
+ 
+ # gazelle:prefix github.com/bufbuild/rules_buf
+@@ -32,19 +31,6 @@ gazelle(
+     command = "update-repos",
+ )
+ 
+-stardoc(
+-    name = "buf_rule_docs",
+-    out = "buf-rules.md",
+-    input = "//buf:defs.bzl",
+-    symbol_names = [
+-        "buf_lint_test",
+-        "buf_breaking_test",
+-    ],
+-    deps = [
+-        "//buf:defs",
+-    ],
+-)
+-
+ buildifier(
+     name = "buildifier",
+ )
+-- 
+2.45.2
+

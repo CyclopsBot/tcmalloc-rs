@@ -1,0 +1,8 @@
+#!/bin/sh
+
+[ -z "$BAZELISK_SKIP_WRAPPER" -a -z "$SHUT_UP_ABOUT_BAZELISK" ] && {
+	echo -e '\e[1;31mWarning: Bazelisk is required but not used. Your build may fail due to a mismatched Bazel version.\e[0m' >&2
+	exit 1
+}
+
+exec "$BAZEL_REAL" "$@"

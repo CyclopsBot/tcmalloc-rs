@@ -1,0 +1,7 @@
+load(":analysis.bzl", "upx_test_suite")
+
+exports_files(["bin"])
+
+upx_test_suite(
+    name = "test_suite",
+)

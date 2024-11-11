@@ -1,0 +1,29 @@
+load("@bazel_env.bzl", "bazel_env")
+
+package(default_visibility = ["//visibility:private"])
+
+bazel_env(
+    name = "direnv",
+    tags = ["manual"],
+    toolchains = {
+        "cc_toolchain": "@bazel_tools//tools/cpp:current_cc_toolchain",
+        "nodejs": "@nodejs_toolchains//:resolved_toolchain",
+    },
+    tools = {
+        "apko": "@rules_apko//apko:apko",
+        "buildifier": "@buildifier_prebuilt//:buildifier",
+        "buildozer": "@multitool//tools/buildozer",
+        "cargo": "@rules_rust//tools/upstream_wrapper:cargo",
+        "cargo_deny": "@multitool//tools/cargo_deny",
+        "clang": "$(CC)",
+        "copybara": "@copybara//java/com/google/copybara",
+        "cyc": "//apps/utils/ci:bin",
+        "gcc": "$(CC)",
+        "go": "@rules_go//go",
+        "ibazel": "@multitool//tools/ibazel",
+        "multitool": "@multitool//tools/multitool",
+        "node": "$(NODE_PATH)",
+        "rustc": "@rules_rust//tools/upstream_wrapper:rustc",
+        "zstd": "@zstd//:zstd_cli",
+    },
+)

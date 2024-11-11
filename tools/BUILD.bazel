@@ -1,0 +1,13 @@
+load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+
+codeowners(
+    name = "codeowners",
+    pattern = "*",
+    teams = ["@CyclopsBot/bazel"],
+    visibility = ["//visibility:public"],
+)
+
+exports_files(
+    srcs = ["modify_mtree.awk"],
+    visibility = ["//visibility:public"],
+)

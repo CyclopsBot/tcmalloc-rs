@@ -1,0 +1,25 @@
+From 9fa5bdc5e8e5b9581772bcc3d4e001d7c4bdfb43 Mon Sep 17 00:00:00 2001
+From: Trashcan <trashcan69666@gmail.com>
+Date: Mon, 22 Jul 2024 21:23:04 -0400
+Subject: [PATCH] fix apko_run
+
+---
+ apko/private/apko_run.bzl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/apko/private/apko_run.bzl b/apko/private/apko_run.bzl
+index b1c397f..fb088c8 100644
+--- a/apko/private/apko_run.bzl
++++ b/apko/private/apko_run.bzl
+@@ -41,7 +41,7 @@ def _impl(ctx):
+     ctx.actions.write(
+         output = output,
+         content = LAUNCHER_TEMPLATE
+-            .replace("{{apko_binary}}", apko_info.binary.path)
++            .replace("{{apko_binary}}", apko_info.binary.short_path)
+             .replace("{{workdir_env}}", "BUILD_" + ctx.attr.workdir.upper() + "_DIRECTORY"),
+         is_executable = True,
+     )
+-- 
+2.45.2
+

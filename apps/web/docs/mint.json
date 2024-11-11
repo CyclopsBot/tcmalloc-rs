@@ -1,0 +1,40 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Cyclops",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0D9373",
+    "light": "#07C983",
+    "dark": "#0D9373",
+    "anchors": {
+      "from": "#0D9373",
+      "to": "#07C983"
+    }
+  },
+  "topAnchor": {
+    "name": "Documentation"
+  },
+  "anchors": [
+    {
+      "name": "API Reference",
+      "openapi": "https://petstore3.swagger.io/api/v3/openapi.json",
+      "url": "api",
+      "icon": "square-terminal"
+    },
+    {
+      "name": "Discord",
+      "icon": "discord",
+      "url": "https://discord.com/"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": ["introduction"]
+    }
+  ]
+}
