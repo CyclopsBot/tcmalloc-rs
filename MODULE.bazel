@@ -1,2 +1,8 @@
+module(
+    name = "tcmalloc-rs",
+    version = "0.0.1",
+    compatibility_level = 1,
+)
+
 bazel_dep(name = "tcmalloc", version = "0.0.0-20240411-5ed309d")
 bazel_dep(name = "rules_rust", version = "0.54.1")
