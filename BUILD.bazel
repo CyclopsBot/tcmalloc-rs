@@ -1,4 +1,4 @@
-load("@rules_codeowners//tools:codeowners.bzl", "codeowners")
+
 load("@rules_rust//rust:defs.bzl", "rust_clippy", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rustfmt_test")
 
 

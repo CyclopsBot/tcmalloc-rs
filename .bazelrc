@@ -1,0 +1,2 @@
+common --host_cxxopt=-std=c++20
+common --cxxopt=-std=c++20
