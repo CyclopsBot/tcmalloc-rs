@@ -1,2 +1,5 @@
 common --host_cxxopt=-std=c++20
 common --cxxopt=-std=c++20
+common --bes_results_url=https://cyclops.buildbuddy.io/invocation/
+common --bes_backend=grpcs://cyclops.buildbuddy.io
+common --remote_cache=grpcs://cyclops.buildbuddy.io

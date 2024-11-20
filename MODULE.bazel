@@ -13,6 +13,6 @@ toolchains = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolcha
 use_repo(toolchains, "zig_sdk")
 
 register_toolchains(
-    "@zig_sdk//toolchain:linux_amd64_gnu.2.38",
-    "@zig_sdk//toolchain:linux_arm64_gnu.2.38",
+    "@zig_sdk//toolchain:linux_amd64_gnu.2.34",
+    "@zig_sdk//toolchain:linux_arm64_gnu.2.34",
 )
