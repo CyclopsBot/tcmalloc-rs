@@ -8,6 +8,12 @@ rust_library(
         "src/**/*.rs",
     ]),
     crate_name = "tcmalloc",
+    # Always build with optimizations enabled
+    rustc_flags = [
+        "-Copt-level=3",
+        "-Clto=true",
+        "-Ccodegen-units=1",
+    ],
     visibility = ["//visibility:public"],
     deps = ["@tcmalloc//tcmalloc"],
 )
