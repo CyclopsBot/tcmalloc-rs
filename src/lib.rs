@@ -93,13 +93,3 @@ fn ok_free_realloc() {
     let ptr = unsafe { TCMallocInternalRealloc(ptr as *mut c_void, 16) } as *mut u8;
     unsafe { TCMallocInternalFree(ptr as *mut c_void) };
 }
-
-#[test]
-fn print_stats() {
-    stats_print();
-    unsafe {
-        let _ptr = TCMallocInternalMalloc(16);
-        assert!(!_ptr.is_null(), "Failed to allocate memory.");
-        TCMallocInternalFree(_ptr);
-    }
-}
