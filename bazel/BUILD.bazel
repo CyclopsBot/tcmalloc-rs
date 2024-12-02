@@ -1,0 +1,13 @@
+platform(
+    name = "platform",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    exec_properties = {
+        "OSFamily": "Linux",
+        # TODO: experiment auto updating this
+        "container-image": "docker://ghcr.io/cyclopsbot/rbe@sha256:e7f62158fe1ade490009ae0b78bba25aedde033ff1e9d29ce9b4753883d99d3f",
+        "dockerNetwork": "off",
+    },
+)
