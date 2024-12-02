@@ -1,0 +1,12 @@
+common --bes_results_url=https://cyclops.buildbuddy.io/invocation/
+common --bes_backend=grpcs://cyclops.buildbuddy.io
+common --remote_cache=grpcs://cyclops.buildbuddy.io
+common --remote_executor=grpcs://cyclops.buildbuddy.io
+common --experimental_remote_downloader=grpcs://cyclops.buildbuddy.io
+common --remote_timeout=3600
+common --remote_cache_compression=true
+common --jobs=120
+common --remote_build_event_upload=all
+common --host_platform=//bazel/rbe:platform
+common --platforms=//bazel/rbe:platform
+common --extra_execution_platforms=//bazel/rbe:platform
