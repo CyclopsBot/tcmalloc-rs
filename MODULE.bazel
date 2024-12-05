@@ -1,0 +1,25 @@
+module(
+    name = "tcmalloc-rs",
+    version = "0.0.1",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "hermetic_cc_toolchain", version = "3.1.1", dev_dependency = True)
+
+bazel_dep(name = "tcmalloc", version = "0.0.0-20240411-5ed309d")
+bazel_dep(name = "rules_rust", version = "0.54.1")
+
+# Use tcmalloc from HEAD
+git_override(
+    module_name = "tcmalloc",
+    commit = "39aa32494c4e492857f7879e6ef5f2254fd558d1",
+    remote = "https://github.com/google/tcmalloc.git",
+)
+
+toolchains = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolchains")
+use_repo(toolchains, "zig_sdk")
+
+register_toolchains(
+    "@zig_sdk//toolchain:linux_amd64_gnu.2.34",
+    "@zig_sdk//toolchain:linux_arm64_gnu.2.34",
+)

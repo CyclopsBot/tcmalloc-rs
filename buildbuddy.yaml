@@ -1,0 +1,31 @@
+actions:
+  - name: "build"
+    container_image: "ubuntu-20.04"
+    triggers:
+      push:
+        branches:
+          - "main"
+      pull_request:
+        branches:
+          - "*"
+    ResourceRequests:
+      cpu: "10000m"
+      memory: "10GB"
+      disk: "40GB"
+    bazel_commands:
+      - "bazel build //..."
+  - name: "test"
+    container_image: "ubuntu-20.04"
+    triggers:
+      push:
+        branches:
+          - "main"
+      pull_request:
+        branches:
+          - "*"
+    ResourceRequests:
+      cpu: "10000m"
+      memory: "10GB"
+      disk: "40GB"
+    bazel_commands:
+      - "bazel test //..."

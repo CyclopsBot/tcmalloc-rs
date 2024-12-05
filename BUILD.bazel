@@ -1,0 +1,45 @@
+load("@rules_rust//rust:defs.bzl", "rust_clippy", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rustfmt_test")
+
+rust_library(
+    name = "lib",
+    srcs = glob([
+        "src/**/*.rs",
+    ]),
+    crate_name = "tcmalloc",
+    # Always build with optimizations enabled
+    rustc_flags = [
+        "-Copt-level=3",
+        "-Clto=true",
+        "-Ccodegen-units=1",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["@tcmalloc//tcmalloc"],
+)
+
+rust_test(
+    name = "test",
+    timeout = "short",
+    crate = ":lib",
+)
+
+rustfmt_test(
+    name = "format",
+    timeout = "short",
+    targets = [":lib"],
+)
+
+rust_doc(
+    name = "doc",
+    crate = ":lib",
+)
+
+rust_doc_test(
+    name = "doc_test",
+    timeout = "short",
+    crate = ":lib",
+)
+
+rust_clippy(
+    name = "clippy",
+    deps = [":lib"],
+)
