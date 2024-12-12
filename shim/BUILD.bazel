@@ -1,0 +1,12 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "lib",
+    srcs = ["wrapper.cpp"],
+    linkstatic = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        "@tcmalloc//tcmalloc:malloc_extension",
+    ],
+    alwayslink = True,
+)

@@ -13,7 +13,10 @@ rust_library(
         "-Ccodegen-units=1",
     ],
     visibility = ["//visibility:public"],
-    deps = ["@tcmalloc//tcmalloc"],
+    deps = [
+        "//shim:lib",
+        "@tcmalloc//tcmalloc",
+    ],
 )
 
 rust_test(
