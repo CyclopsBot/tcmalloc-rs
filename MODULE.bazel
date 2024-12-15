@@ -14,12 +14,7 @@ bazel_dep(name = "rules_cc", version = "0.1.0")
 # Use tcmalloc from HEAD
 git_override(
     module_name = "tcmalloc",
-    commit = "00319f1755349cc7b76f3750c30d64ede4b26560",
-    patch_strip = 1,
-    patches = [
-        "//third_party/patches/tcmalloc:0001-fix.patch",
-        "//third_party/patches/tcmalloc:0002-fix-rules-cc-load.patch",
-    ],
+    commit = "e4308a4062629732aba34940c8344d716c3d1604",
     remote = "https://github.com/google/tcmalloc.git",
 )
 
