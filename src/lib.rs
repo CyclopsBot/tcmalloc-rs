@@ -1,3 +1,5 @@
+#![deny(clippy::pedantic)]
+
 //! ## Motivation
 //!
 //! This is a wrapper for the [tcmalloc](https://google.github.io/tcmalloc/) allocator.
@@ -36,10 +38,10 @@ extern "C" {
 /// Print statistics of the memory allocator.
 ///
 /// This function will print statistics about memory usage to `stderr`.
-pub fn print_stats() {
+#[must_use]
+pub fn print_stats() -> String {
     let stats = unsafe { CStr::from_ptr(get_stats()) };
-    let stats_safe = String::from_utf8_lossy(stats.to_bytes()).to_string();
-    println!("{}", stats_safe);
+    String::from_utf8_lossy(stats.to_bytes()).to_string()
 }
 
 pub fn print_stats_summary() {
@@ -70,17 +72,17 @@ pub struct TcMalloc;
 unsafe impl GlobalAlloc for TcMalloc {
     #[inline]
     unsafe fn alloc(&self, layout: core::alloc::Layout) -> *mut u8 {
-        TCMallocInternalMalloc(layout.size()) as *mut u8
+        TCMallocInternalMalloc(layout.size()).cast::<u8>()
     }
 
     #[inline]
     unsafe fn alloc_zeroed(&self, layout: core::alloc::Layout) -> *mut u8 {
-        TCMallocInternalCalloc(1, layout.size()) as *mut u8
+        TCMallocInternalCalloc(1, layout.size()).cast::<u8>()
     }
 
     #[inline]
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: core::alloc::Layout) {
-        TCMallocInternalFree(ptr as *mut c_void)
+        TCMallocInternalFree(ptr.cast::<c_void>());
     }
 
     #[inline]
@@ -90,7 +92,7 @@ unsafe impl GlobalAlloc for TcMalloc {
         _layout: core::alloc::Layout,
         new_size: usize,
     ) -> *mut u8 {
-        TCMallocInternalRealloc(ptr as *mut c_void, new_size) as *mut u8
+        TCMallocInternalRealloc(ptr.cast::<c_void>(), new_size).cast::<u8>()
     }
 }
 
