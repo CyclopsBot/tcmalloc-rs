@@ -9,8 +9,6 @@ rust_library(
     # Always build with optimizations enabled
     rustc_flags = [
         "-Copt-level=3",
-        "-Clto=true",
-        "-Ccodegen-units=1",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -23,6 +21,7 @@ rust_test(
     name = "test",
     timeout = "short",
     crate = ":lib",
+    tags = ["nosan"],
 )
 
 rustfmt_test(
