@@ -8,7 +8,7 @@ actions:
       pull_request:
         branches:
           - "*"
-    ResourceRequests:
+    resource_requests:
       cpu: "10000m"
       memory: "10GB"
       disk: "40GB"
@@ -23,7 +23,7 @@ actions:
       pull_request:
         branches:
           - "*"
-    ResourceRequests:
+    resource_requests:
       cpu: "10000m"
       memory: "10GB"
       disk: "40GB"
