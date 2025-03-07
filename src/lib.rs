@@ -13,13 +13,13 @@
 
 use core::{
     alloc::GlobalAlloc,
-    ffi::{c_char, c_void, CStr},
+    ffi::{CStr, c_char, c_void},
 };
 
-extern "C" {
+unsafe extern "C" {
     /// Allocate a block of memory of at least `size` bytes, aligned to the
     /// given alignment.
-    pub fn TCMallocInternalMalloc(size: usize) -> *mut c_void;
+    pub unsafe fn TCMallocInternalMalloc(size: usize) -> *mut c_void;
     /// Allocate a block of memory of at least `size` bytes, aligned to the
     /// given alignment, and zeroed.
     pub fn TCMallocInternalCalloc(n: usize, size: usize) -> *mut c_void;
@@ -72,17 +72,19 @@ pub struct TcMalloc;
 unsafe impl GlobalAlloc for TcMalloc {
     #[inline]
     unsafe fn alloc(&self, layout: core::alloc::Layout) -> *mut u8 {
-        TCMallocInternalMalloc(layout.size()).cast::<u8>()
+        unsafe { TCMallocInternalMalloc(layout.size()).cast::<u8>() }
     }
 
     #[inline]
     unsafe fn alloc_zeroed(&self, layout: core::alloc::Layout) -> *mut u8 {
-        TCMallocInternalCalloc(1, layout.size()).cast::<u8>()
+        unsafe { TCMallocInternalCalloc(1, layout.size()).cast::<u8>() }
     }
 
     #[inline]
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: core::alloc::Layout) {
-        TCMallocInternalFree(ptr.cast::<c_void>());
+        unsafe {
+            TCMallocInternalFree(ptr.cast::<c_void>());
+        }
     }
 
     #[inline]
@@ -92,7 +94,7 @@ unsafe impl GlobalAlloc for TcMalloc {
         _layout: core::alloc::Layout,
         new_size: usize,
     ) -> *mut u8 {
-        TCMallocInternalRealloc(ptr.cast::<c_void>(), new_size).cast::<u8>()
+        unsafe { TCMallocInternalRealloc(ptr.cast::<c_void>(), new_size).cast::<u8>() }
     }
 }
 
