@@ -8,13 +8,13 @@ bazel_dep(name = "hermetic_cc_toolchain", version = "3.2.0", dev_dependency = Tr
 bazel_dep(name = "platforms", version = "0.0.11", dev_dependency = True)
 
 bazel_dep(name = "tcmalloc", version = "0.0.0-20240411-5ed309d")
-bazel_dep(name = "rules_rust", version = "0.58.0")
+bazel_dep(name = "rules_rust", version = "0.59.1")
 bazel_dep(name = "rules_cc", version = "0.1.1")
 
 # Use tcmalloc from HEAD
 git_override(
     module_name = "tcmalloc",
-    commit = "2aa753c94dc06a0fdb6cfd8f3c4b994e727d0187",
+    commit = "dc751813976f38bc793138578d28c9f602dc2837",
     remote = "https://github.com/google/tcmalloc.git",
 )
 
