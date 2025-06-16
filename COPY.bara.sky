@@ -1,0 +1,83 @@
+"""
+This configuration file defines the synchronization workflows between our
+monorepo and the public repo.
+
+It sets up two main workflows:
+1.  A "push" workflow to export changes from the internal monorepo to the
+    public repository.
+2.  A "pull" or "reverse" workflow to import pull requests from the public
+    repository back into the internal monorepo.
+"""
+
+load("//libs/copybara/repos", "monorepo", "monorepo_pr")
+load("//libs/copybara/transformations", "insert_bazel_oss_config", "insert_metadata", "remove_internal", "reverse_bazel_oss_config")
+
+repo_url = "https://github.com/CyclopsBot/tcmalloc-rs.git"
+repo_branch = "main"
+
+# TODO
+remove_codeowners = core.transform(
+    transformations = [
+        buildozer.delete(target = "libs/rust/tcmalloc:codeowners", rule_type = "rules_codeowners"),
+    ],
+)
+
+# [buildozer.delete(target = "libs/rust/tcmalloc:codeowners", rule_type = "rules_codeowners")]
+
+def register_workflow():
+    core.workflow(
+        name = "tcmalloc_rs",
+        origin = monorepo,
+        destination = git.github_destination(
+            url = repo_url,
+            push = repo_branch,
+        ),
+        mode = "SQUASH",
+        origin_files = glob(["libs/rust/tcmalloc/**", "infra/oss/bazel/**"]),
+        destination_files = glob(["**"]),
+        authoring = authoring.pass_thru(default = "Copybara <copybara@cyclopsbot.xyz>"),
+        transformations = [
+            # Remove references to rules_codeowners
+            buildozer.delete(target = "libs/rust/tcmalloc:codeowners", rule_type = "rules_codeowners"),
+            # Add oss only files to the root.
+            core.move("libs/rust/tcmalloc/oss/MODULE.bazel", "MODULE.bazel"),
+            core.move("libs/rust/tcmalloc/oss/.bazelrc", ".bazelrc"),
+            core.replace(
+                before = "//libs/rust/tcmalloc/",
+                after = "//",
+                paths = glob(["**/BUILD.bazel"]),
+            ),
+            # Dont leak our internal repo structure to external consumers.
+            core.move("libs/rust/tcmalloc", ""),
+            format.buildifier(paths = glob(["*.bzl", "*.bazel", "BUILD"]), lint = "FIX", lint_warnings = ["all"]),
+        ] + insert_metadata + remove_internal + insert_bazel_oss_config,
+    )
+
+    core.workflow(
+        name = "tcmalloc_rs_pr",
+        origin = git.github_pr_origin(
+            url = repo_url,
+            branch = repo_branch,
+        ),
+        destination = monorepo_pr,
+        mode = "CHANGE_REQUEST",
+        origin_files = glob(["**"]),
+        destination_files = glob(["apps/minecraft/skyblock-pack/**"]),
+        authoring = authoring.pass_thru(default = "Copybara <copybara@cyclopsbot.xyz>"),
+        transformations = [
+            metadata.expose_label("COPYBARA_INTEGRATE_REVIEW"),
+            metadata.save_author("ORIGINAL_AUTHOR"),
+            metadata.expose_label("GITHUB_PR_NUMBER", new_name = "Closes", separator = repo_url.replace("git@github.com:", " ").replace(".git", "#")),
+            core.replace(
+                before = "//",
+                after = "//libs/rust/tcmalloc/",
+                paths = glob(["**.bazel"]),
+            ),
+            # TODO
+            #core.reverse(remove_codeowners),
+            core.move("MODULE.bazel", "libs/rust/tcmalloc/oss"),
+            core.move(".bazelrc", "libs/rust/tcmalloc/oss"),
+            core.move("", "libs/rust/tcmalloc"),
+            # TODO
+        ] + reverse_bazel_oss_config,
+    )
