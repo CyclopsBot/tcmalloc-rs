@@ -34,7 +34,7 @@ def register_workflow():
         ),
         mode = "SQUASH",
         origin_files = glob(["libs/rust/tcmalloc/**", "infra/oss/bazel/**"]),
-        destination_files = glob(["**"]),
+        destination_files = glob(["**"], exclude = ["copy.bara.sky"]),
         authoring = authoring.pass_thru(default = "Copybara <copybara@cyclopsbot.xyz>"),
         transformations = [
             # Remove references to rules_codeowners
