@@ -5,7 +5,7 @@ module(
 )
 
 bazel_dep(name = "hermetic_cc_toolchain", version = "4.0.0", dev_dependency = True)
-bazel_dep(name = "platforms", version = "0.0.11", dev_dependency = True)
+bazel_dep(name = "platforms", version = "1.0.0", dev_dependency = True)
 
 bazel_dep(name = "tcmalloc", version = "0.0.0-20240411-5ed309d")
 bazel_dep(name = "rules_rust", version = "0.61.0")
