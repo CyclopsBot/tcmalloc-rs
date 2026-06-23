@@ -1,47 +1,108 @@
-load("@rules_rust//rust:defs.bzl", "rust_clippy", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rustfmt_test")
+load("@cxx.rs//tools/bazel:rust_cxx_bridge.bzl", "rust_cxx_bridge")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load(
+    "@rules_rust//rust:defs.bzl",
+    "rust_clippy",
+    "rust_doc",
+    "rust_doc_test",
+    "rust_library",
+    "rust_test",
+    "rustfmt_test",
+)
+
+package(default_visibility = ["//visibility:public"])
+
+LINUX_COMPATIBLE = select({
+    "@platforms//os:linux": [],
+    "//conditions:default": ["@platforms//:incompatible"],
+})
+
+rust_cxx_bridge(
+    name = "tcmalloc_bridge",
+    src = "src/lib.rs",
+    target_compatible_with = LINUX_COMPATIBLE,
+    deps = [":tcmalloc_bridge_api"],
+)
+
+cc_library(
+    name = "tcmalloc_bridge_api",
+    hdrs = ["include/tcmalloc_rs/tcmalloc_bridge.h"],
+    strip_include_prefix = "include",
+    target_compatible_with = LINUX_COMPATIBLE,
+    deps = [
+        "@cxx.rs//:core",
+        "@tcmalloc//tcmalloc:malloc_extension",
+    ],
+)
+
+cc_library(
+    name = "tcmalloc_bridge_cc",
+    srcs = ["tcmalloc_bridge.cc"],
+    hdrs = ["include/tcmalloc_rs/tcmalloc_bridge.h"],
+    implementation_deps = [
+        ":tcmalloc_bridge_api",
+        "@abseil-cpp//absl/time",
+    ],
+    linkstatic = True,
+    target_compatible_with = LINUX_COMPATIBLE,
+    deps = [
+        "@cxx.rs//:core",
+        "@tcmalloc//tcmalloc:malloc_extension",
+    ],
+    alwayslink = True,
+)
 
 rust_library(
     name = "lib",
-    srcs = glob([
-        "src/**/*.rs",
-    ]),
+    srcs = glob(["src/**/*.rs"]),
     crate_name = "tcmalloc",
-    # Always build with optimizations enabled
+    crate_root = "src/lib.rs",
+    edition = "2024",
+    rustc_env = {
+        "CARGO_PKG_VERSION": "0.1.0",
+    },
     rustc_flags = [
         "-Copt-level=3",
     ],
-    visibility = ["//visibility:public"],
+    target_compatible_with = LINUX_COMPATIBLE,
     deps = [
-        "//shim:lib",
+        ":tcmalloc_bridge",
+        ":tcmalloc_bridge_cc",
+        "@cxx.rs//:cxx",
         "@tcmalloc//tcmalloc",
     ],
 )
 
 rust_test(
     name = "test",
-    timeout = "short",
     crate = ":lib",
     tags = ["nosan"],
+    target_compatible_with = LINUX_COMPATIBLE,
+    timeout = "short",
 )
 
 rustfmt_test(
     name = "format",
-    timeout = "short",
+    target_compatible_with = LINUX_COMPATIBLE,
     targets = [":lib"],
+    timeout = "short",
 )
 
 rust_doc(
     name = "doc",
     crate = ":lib",
+    target_compatible_with = LINUX_COMPATIBLE,
 )
 
 rust_doc_test(
     name = "doc_test",
-    timeout = "short",
     crate = ":lib",
+    target_compatible_with = LINUX_COMPATIBLE,
+    timeout = "short",
 )
 
 rust_clippy(
     name = "clippy",
+    target_compatible_with = LINUX_COMPATIBLE,
     deps = [":lib"],
 )
